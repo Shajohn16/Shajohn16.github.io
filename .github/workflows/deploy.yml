@@ -1,14 +1,14 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# This workflow will install Python dependencies, run tests and lint, and deploy to GitHub Pages
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
 name: Deploy
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master ] 
 
 permissions:
-  contents: read
+  contents: write # Updated permission for GitHub Pages deployment
   pages: write
   id-token: write
 
@@ -23,34 +23,33 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Poetry
-        shell: bash
-        run: pipx install poetry
-      
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-          cache: 'poetry'
-      
+          cache: 'pip' # Changed cache to pip to align with Python dependency management
+
+      - name: Install Poetry
+        run: pipx install poetry
+
       - name: Install dependencies
         run: poetry install --with=dev
-      
+
       - name: Lint with Ruff
         run: poetry run ruff check --output-format=github .
-      
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
-      
+
       - name: Build with Python Jinja
         run: poetry run python main.py
-      
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
-  
+          path: . # Specify the correct build output directory
+
   deploy:
     environment:
       name: github-pages
